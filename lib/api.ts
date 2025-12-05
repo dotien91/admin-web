@@ -64,6 +64,8 @@ export interface Composition {
   boardSize: BoardSize;
   synergies: Synergy[];
   units: Unit[];
+  earlyGame?: Unit[];
+  midGame?: Unit[];
   bench?: Unit[];
   carryItems?: CarryItem[];
   notes?: string[];
@@ -83,6 +85,8 @@ export interface CreateCompositionDto {
   boardSize: BoardSize;
   synergies: Synergy[];
   units: Unit[];
+  earlyGame?: Unit[];
+  midGame?: Unit[];
   bench?: Unit[];
   carryItems?: CarryItem[];
   notes?: string[];
@@ -276,7 +280,7 @@ class ApiClient {
   async getAllItems(): Promise<Item[]> {
     // Lấy tất cả items với limit lớn
     const response = await this.request<PaginationResponse<Item>>(
-      '/items?limit=1000&orderBy=name&order=asc'
+      '/tft-items?limit=1000&orderBy=name&order=asc'
     );
     return response.data;
   }
