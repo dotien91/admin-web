@@ -8,15 +8,6 @@ export interface BoardSize {
   cols: number;
 }
 
-export interface Synergy {
-  id: string;
-  name: string;
-  abbreviation: string;
-  count: number;
-  max: number;
-  color: string;
-}
-
 export interface Position {
   row: number;
   col: number;
@@ -62,7 +53,6 @@ export interface Composition {
   isLateGame?: boolean;
   tier?: string; // S, A, B, C, D
   boardSize: BoardSize;
-  synergies: Synergy[];
   units: Unit[];
   earlyGame?: Unit[];
   midGame?: Unit[];
@@ -83,7 +73,6 @@ export interface CreateCompositionDto {
   isLateGame?: boolean;
   tier?: string; // S, A, B, C, D
   boardSize: BoardSize;
-  synergies: Synergy[];
   units: Unit[];
   earlyGame?: Unit[];
   midGame?: Unit[];
