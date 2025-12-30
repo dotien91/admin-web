@@ -297,12 +297,12 @@ export default function EditCompositionPage() {
   };
 
   // Toggle item selection
-  const toggleItem = (unitItems: string[], itemId: string, updateFn: (items: string[]) => void) => {
-    const isSelected = unitItems.includes(itemId);
+  const toggleItem = (unitItems: string[], itemApiName: string, updateFn: (items: string[]) => void) => {
+    const isSelected = unitItems.includes(itemApiName);
     if (isSelected) {
-      updateFn(unitItems.filter(id => id !== itemId));
+      updateFn(unitItems.filter(apiName => apiName !== itemApiName));
     } else {
-      updateFn([...unitItems, itemId]);
+      updateFn([...unitItems, itemApiName]);
     }
   };
 
@@ -622,13 +622,13 @@ export default function EditCompositionPage() {
                         <div className="border border-zinc-300 dark:border-zinc-700 rounded-lg p-3 bg-white dark:bg-zinc-800 max-h-[200px] overflow-y-auto">
                           <div className="grid grid-cols-6 gap-2">
                             {items.map((item) => {
-                              const itemId = item.id.toString();
-                              const isSelected = (unit.items || []).includes(itemId);
+                              const itemApiName = item.apiName;
+                              const isSelected = (unit.items || []).includes(itemApiName);
                               return (
                                 <button
                                   key={item.id}
                                   type="button"
-                                  onClick={() => toggleItem(unit.items || [], itemId, (items) => updateEarlyGameUnit(index, 'items', items))}
+                                  onClick={() => toggleItem(unit.items || [], itemApiName, (items) => updateEarlyGameUnit(index, 'items', items))}
                                   className={`relative p-1 rounded border-2 transition-all ${
                                     isSelected
                                       ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
@@ -842,13 +842,13 @@ export default function EditCompositionPage() {
                         <div className="border border-zinc-300 dark:border-zinc-700 rounded-lg p-3 bg-white dark:bg-zinc-800 max-h-[200px] overflow-y-auto">
                           <div className="grid grid-cols-6 gap-2">
                             {items.map((item) => {
-                              const itemId = item.id.toString();
-                              const isSelected = (unit.items || []).includes(itemId);
+                              const itemApiName = item.apiName;
+                              const isSelected = (unit.items || []).includes(itemApiName);
                               return (
                                 <button
                                   key={item.id}
                                   type="button"
-                                  onClick={() => toggleItem(unit.items || [], itemId, (items) => updateMidGameUnit(index, 'items', items))}
+                                  onClick={() => toggleItem(unit.items || [], itemApiName, (items) => updateMidGameUnit(index, 'items', items))}
                                   className={`relative p-1 rounded border-2 transition-all ${
                                     isSelected
                                       ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
@@ -1065,13 +1065,13 @@ export default function EditCompositionPage() {
                         <div className="border border-zinc-300 dark:border-zinc-700 rounded-lg p-3 bg-white dark:bg-zinc-800 max-h-[200px] overflow-y-auto">
                           <div className="grid grid-cols-6 gap-2">
                             {items.map((item) => {
-                              const itemId = item.id.toString();
-                              const isSelected = (unit.items || []).includes(itemId);
+                              const itemApiName = item.apiName;
+                              const isSelected = (unit.items || []).includes(itemApiName);
                               return (
                                 <button
                                   key={item.id}
                                   type="button"
-                                  onClick={() => toggleItem(unit.items || [], itemId, (items) => updateUnit(index, 'items', items))}
+                                  onClick={() => toggleItem(unit.items || [], itemApiName, (items) => updateUnit(index, 'items', items))}
                                   className={`relative p-1 rounded border-2 transition-all ${
                                     isSelected
                                       ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
@@ -1104,11 +1104,11 @@ export default function EditCompositionPage() {
                       </p>
                       {unit.items && unit.items.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-2">
-                          {unit.items.map((itemId) => {
-                            const item = items.find((i) => i.id.toString() === itemId);
+                          {unit.items.map((itemApiName) => {
+                            const item = items.find((i) => i.apiName === itemApiName);
                             return item ? (
                               <span
-                                key={itemId}
+                                key={itemApiName}
                                 className="px-2 py-1 bg-blue-100 dark:bg-blue-900/40 rounded text-xs text-blue-800 dark:text-blue-200 flex items-center gap-1"
                               >
                                 <img

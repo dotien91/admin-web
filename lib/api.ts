@@ -23,7 +23,7 @@ export interface Unit {
   need3Star?: boolean; // Cần lên 3 sao
   position: Position;
   image?: string;
-  items?: string[]; // Array of item IDs
+  items?: string[]; // Array of item apiNames
   itemsDetails?: Array<{ // Populated items
     id: string | number;
     apiName?: string | null;
@@ -32,6 +32,11 @@ export interface Unit {
     tag?: string | null;
     unique?: boolean | null;
   }>;
+}
+
+export interface Augment {
+  name: string;
+  tier: number; // 1, 2, hoặc 3
 }
 
 export interface CarryItem {
@@ -59,6 +64,9 @@ export interface Composition {
   bench?: Unit[];
   carryItems?: CarryItem[];
   notes?: string[];
+  carouselPriority?: number;
+  augments?: Augment[];
+  coreChampion?: Unit;
   createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date;
@@ -79,6 +87,9 @@ export interface CreateCompositionDto {
   bench?: Unit[];
   carryItems?: CarryItem[];
   notes?: string[];
+  carouselPriority?: number;
+  augments?: Augment[];
+  coreChampion?: Unit;
 }
 
 export interface UpdateCompositionDto extends Partial<CreateCompositionDto> {}
@@ -248,6 +259,13 @@ class ApiClient {
   async deleteComposition(id: string | number): Promise<void> {
     return this.request<void>(`/compositions/${id}`, {
       method: 'DELETE',
+    });
+  }
+
+  async parseMobalyticsHTML(html: string): Promise<CreateCompositionDto> {
+    return this.request<CreateCompositionDto>('/compositions/parse-mobalytics-html', {
+      method: 'POST',
+      body: JSON.stringify({ html }),
     });
   }
 
