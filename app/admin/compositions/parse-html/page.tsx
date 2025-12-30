@@ -1,9 +1,68 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { apiClient, CreateCompositionDto } from '@/lib/api';
+import { apiClient, CreateCompositionDto, Item } from '@/lib/api';
+
+// Utility function để convert item name sang apiName
+function convertItemNameToApiName(itemName: string, items: Item[]): string {
+  if (!itemName) return itemName;
+
+  // Normalize item name: lowercase, remove spaces, hyphens
+  const normalized = itemName.toLowerCase().trim();
+  
+  // Tìm exact match trong items
+  const exactMatch = items.find(
+    (item) =>
+      item.name.toLowerCase() === normalized ||
+      item.apiName.toLowerCase() === normalized ||
+      item.name.toLowerCase().replace(/[^a-z0-9]/g, '') === normalized.replace(/[^a-z0-9]/g, '')
+  );
+  
+  if (exactMatch) {
+    return exactMatch.apiName;
+  }
+
+  // Nếu không tìm thấy exact match, thử convert pattern
+  // Ví dụ: "guinsoos-rageblade" -> "TFT_Item_GuinsoosRageblade"
+  const parts = normalized.split(/[-_\s]+/);
+  const camelCase = parts
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
+  
+  const possibleApiName = `TFT_Item_${camelCase}`;
+  
+  // Tìm trong items xem có match không
+  const patternMatch = items.find(
+    (item) => item.apiName.toLowerCase() === possibleApiName.toLowerCase()
+  );
+  
+  if (patternMatch) {
+    return patternMatch.apiName;
+  }
+
+  // Nếu vẫn không tìm thấy, thử tìm partial match
+  const partialMatch = items.find((item) => {
+    const itemNameNormalized = item.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const itemApiNameNormalized = item.apiName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const searchNormalized = normalized.replace(/[^a-z0-9]/g, '');
+    
+    return (
+      itemNameNormalized.includes(searchNormalized) ||
+      searchNormalized.includes(itemNameNormalized) ||
+      itemApiNameNormalized.includes(searchNormalized) ||
+      searchNormalized.includes(itemApiNameNormalized)
+    );
+  });
+
+  if (partialMatch) {
+    return partialMatch.apiName;
+  }
+
+  // Nếu không tìm thấy, trả về original name
+  return itemName;
+}
 
 export default function ParseHtmlPage() {
   const router = useRouter();
@@ -13,6 +72,24 @@ export default function ParseHtmlPage() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [items, setItems] = useState<Item[]>([]);
+  const [loadingItems, setLoadingItems] = useState(true);
+
+  // Load items khi component mount
+  useEffect(() => {
+    const loadItems = async () => {
+      try {
+        setLoadingItems(true);
+        const allItems = await apiClient.getAllItems();
+        setItems(allItems);
+      } catch (err) {
+        console.error('Error loading items:', err);
+      } finally {
+        setLoadingItems(false);
+      }
+    };
+    loadItems();
+  }, []);
 
   const handleParse = async () => {
     if (!html.trim()) {
@@ -27,6 +104,38 @@ export default function ParseHtmlPage() {
 
     try {
       const result = await apiClient.parseMobalyticsHTML(html);
+      
+      // Convert items từ name sang apiName
+      if (items.length > 0) {
+        // Convert items trong units
+        if (result.units) {
+          result.units = result.units.map((unit) => ({
+            ...unit,
+            items: unit.items
+              ? unit.items.map((itemName) => convertItemNameToApiName(itemName, items))
+              : undefined,
+          }));
+        }
+
+        // Convert items trong coreChampion
+        if (result.coreChampion && result.coreChampion.items) {
+          result.coreChampion = {
+            ...result.coreChampion,
+            items: result.coreChampion.items.map((itemName) =>
+              convertItemNameToApiName(itemName, items)
+            ),
+          };
+        }
+
+        // Convert items trong carryItems
+        if (result.carryItems) {
+          result.carryItems = result.carryItems.map((carry) => ({
+            ...carry,
+            items: carry.items.map((itemName) => convertItemNameToApiName(itemName, items)),
+          }));
+        }
+      }
+
       setParsedData(result);
       setSuccess('Parse HTML thành công!');
     } catch (err) {
@@ -106,9 +215,14 @@ export default function ParseHtmlPage() {
               placeholder="Dán HTML từ trang Mobalytics vào đây..."
               className="w-full h-96 px-4 py-3 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white font-mono text-sm"
             />
+            {loadingItems && (
+              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+                Đang tải danh sách items...
+              </p>
+            )}
             <button
               onClick={handleParse}
-              disabled={loading || !html.trim()}
+              disabled={loading || !html.trim() || loadingItems}
               className="mt-4 w-full px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? 'Đang parse...' : 'Parse HTML'}
