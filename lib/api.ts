@@ -151,6 +151,24 @@ export interface Item {
   unique?: boolean | null;
 }
 
+export interface TftAugment {
+  id: string | number;
+  apiName: string;
+  name: string;
+  enName?: string | null;
+  desc?: string | null;
+  icon?: string | null;
+  associatedTraits?: string[];
+  incompatibleTraits?: string[];
+  composition?: string[];
+  effects?: Record<string, any>;
+  tags?: string[];
+  unique?: boolean;
+  from?: string | null;
+  augmentId?: string | null;
+  disabled?: boolean;
+}
+
 class ApiClient {
   private baseUrl: string;
 
@@ -288,6 +306,15 @@ class ApiClient {
     // Lấy tất cả items với limit lớn
     const response = await this.request<PaginationResponse<Item>>(
       '/tft-items?limit=1000&orderBy=name&order=asc'
+    );
+    return response.data;
+  }
+
+  // TFT Augments API
+  async getAllAugments(): Promise<TftAugment[]> {
+    // Lấy tất cả augments với limit lớn
+    const response = await this.request<PaginationResponse<TftAugment>>(
+      '/tft-augments?limit=1000&orderBy=name&order=asc'
     );
     return response.data;
   }

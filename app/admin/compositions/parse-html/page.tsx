@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { apiClient, CreateCompositionDto, Item } from '@/lib/api';
+import { apiClient, CreateCompositionDto, Item, TftAugment } from '@/lib/api';
 
 // Utility function để convert item name sang apiName
 function convertItemNameToApiName(itemName: string, items: Item[]): string {
@@ -74,6 +74,8 @@ export default function ParseHtmlPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [loadingItems, setLoadingItems] = useState(true);
+  const [augments, setAugments] = useState<TftAugment[]>([]);
+  const [loadingAugments, setLoadingAugments] = useState(true);
 
   // Load items khi component mount
   useEffect(() => {
@@ -89,6 +91,22 @@ export default function ParseHtmlPage() {
       }
     };
     loadItems();
+  }, []);
+
+  // Load augments khi component mount
+  useEffect(() => {
+    const loadAugments = async () => {
+      try {
+        setLoadingAugments(true);
+        const allAugments = await apiClient.getAllAugments();
+        setAugments(allAugments);
+      } catch (err) {
+        console.error('Error loading augments:', err);
+      } finally {
+        setLoadingAugments(false);
+      }
+    };
+    loadAugments();
   }, []);
 
   const handleParse = async () => {
@@ -346,15 +364,27 @@ export default function ParseHtmlPage() {
                       Augments ({parsedData.augments.length})
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {parsedData.augments.map((augment, index) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 bg-blue-100 dark:bg-blue-900/40 rounded text-sm text-blue-800 dark:text-blue-200 flex items-center gap-1"
-                        >
-                          <span className="font-semibold">T{augment.tier}:</span>
-                          <span>{augment.name}</span>
-                        </span>
-                      ))}
+                      {parsedData.augments.map((augment, index) => {
+                        // Tìm augment trong database để lấy tên thực tế
+                        // augment.name từ backend là apiName (ví dụ: "TFT_Augment_UpwardMobility")
+                        const augmentData = augments.find((a) => a.apiName === augment.name);
+                        const displayName = augmentData?.name || augment.name;
+                        
+                        return (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-blue-100 dark:bg-blue-900/40 rounded text-sm text-blue-800 dark:text-blue-200 flex items-center gap-1"
+                          >
+                            <span className="font-semibold">T{augment.tier}:</span>
+                            <span>{displayName}</span>
+                            {augmentData && (
+                              <span className="text-xs text-blue-600 dark:text-blue-300 opacity-75">
+                                ({augment.name})
+                              </span>
+                            )}
+                          </span>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
