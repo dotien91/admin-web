@@ -377,7 +377,7 @@ export default function EditCompositionPage() {
           </div>
 
           {/* Board Size - Mặc định 4x7, ẩn form */}
-          {false && (
+          {false && composition && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-black dark:text-zinc-50">Kích thước bàn cờ</h2>
             <div className="grid grid-cols-2 gap-4">
@@ -389,9 +389,9 @@ export default function EditCompositionPage() {
                   type="number"
                   required
                   min="1"
-                  value={composition.boardSize.rows}
+                  value={composition?.boardSize?.rows ?? 4}
                   onChange={(e) =>
-                    updateField('boardSize', {
+                    composition && composition.boardSize && updateField('boardSize', {
                       ...composition.boardSize,
                       rows: parseInt(e.target.value),
                     })
@@ -407,9 +407,9 @@ export default function EditCompositionPage() {
                   type="number"
                   required
                   min="1"
-                  value={composition.boardSize.cols}
+                  value={composition?.boardSize?.cols ?? 7}
                   onChange={(e) =>
-                    updateField('boardSize', {
+                    composition && composition.boardSize && updateField('boardSize', {
                       ...composition.boardSize,
                       cols: parseInt(e.target.value),
                     })
@@ -464,7 +464,7 @@ export default function EditCompositionPage() {
             </div>
             )}
             {/* Synergies được tính tự động, không cần chỉnh sửa */}
-            {false && composition.synergies.map((synergy, index) => (
+            {false && composition?.synergies?.map((synergy, index) => (
               <div key={index} className="border border-zinc-300 dark:border-zinc-700 rounded-lg p-4 space-y-3">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
