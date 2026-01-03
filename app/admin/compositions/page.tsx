@@ -79,20 +79,12 @@ export default function CompositionsPage() {
               Quản lý danh sách compositions
             </p>
           </div>
-          <div className="flex gap-3">
-            <Link
-              href="/admin/compositions/parse-html"
-              className="px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
-            >
-              Parse HTML
-            </Link>
-            <Link
-              href="/admin/compositions/new"
-              className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
-            >
-              + Tạo mới
-            </Link>
-          </div>
+          <Link
+            href="/admin/compositions/new"
+            className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
+          >
+            + Tạo mới
+          </Link>
         </div>
 
         {/* Filters */}
