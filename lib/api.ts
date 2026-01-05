@@ -3,6 +3,40 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3900';
 const API_PREFIX = '/api/v1';
 
+// Auth interfaces
+export interface User {
+  id: number | string;
+  email: string | null;
+  provider: string;
+  socialId?: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  photo?: any | null;
+  role?: any | null;
+  status?: any;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  refreshToken: string;
+  tokenExpires: number;
+  user: User;
+}
+
+export interface RefreshResponse {
+  token: string;
+  refreshToken: string;
+  tokenExpires: number;
+}
+
 export interface BoardSize {
   rows: number;
   cols: number;
@@ -171,13 +205,33 @@ export interface TftAugment {
 
 class ApiClient {
   private baseUrl: string;
+  private token: string | null = null;
 
   constructor() {
     this.baseUrl = `${API_BASE_URL}${API_PREFIX}`;
+    // Load token from localStorage on initialization
+    if (typeof window !== 'undefined') {
+      this.token = localStorage.getItem('auth_token');
+    }
   }
 
   getBaseUrl(): string {
     return this.baseUrl;
+  }
+
+  setToken(token: string | null): void {
+    this.token = token;
+    if (typeof window !== 'undefined') {
+      if (token) {
+        localStorage.setItem('auth_token', token);
+      } else {
+        localStorage.removeItem('auth_token');
+      }
+    }
+  }
+
+  getToken(): string | null {
+    return this.token;
   }
 
   private async request<T>(
@@ -186,13 +240,20 @@ class ApiClient {
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+
+    // Add Authorization header if token exists
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+    
     try {
       const response = await fetch(url, {
         ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
+        headers,
       });
 
       if (!response.ok) {
@@ -317,6 +378,75 @@ class ApiClient {
       '/tft-augments?limit=1000&orderBy=name&order=asc'
     );
     return response.data;
+  }
+
+  // Auth API
+  async login(credentials: LoginRequest): Promise<LoginResponse> {
+    const response = await this.request<LoginResponse>('/auth/email/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
+    // Save tokens after successful login
+    if (response.token) {
+      this.setToken(response.token);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth_refresh_token', response.refreshToken);
+      }
+    }
+    return response;
+  }
+
+  async logout(): Promise<void> {
+    try {
+      await this.request<void>('/auth/logout', {
+        method: 'POST',
+      });
+    } catch (error) {
+      // Ignore errors on logout
+      console.error('Logout error:', error);
+    } finally {
+      // Always clear token locally
+      this.setToken(null);
+    }
+  }
+
+  async getMe(): Promise<User | null> {
+    try {
+      return await this.request<User>('/auth/me');
+    } catch (error) {
+      // If unauthorized, clear token
+      if (error instanceof Error && error.message.includes('401')) {
+        this.setToken(null);
+      }
+      return null;
+    }
+  }
+
+  async refreshToken(): Promise<RefreshResponse> {
+    const refreshToken = typeof window !== 'undefined' 
+      ? localStorage.getItem('auth_refresh_token') 
+      : null;
+    
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    const response = await this.request<RefreshResponse>('/auth/refresh', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${refreshToken}`,
+      },
+    });
+
+    // Update tokens
+    if (response.token) {
+      this.setToken(response.token);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth_refresh_token', response.refreshToken);
+      }
+    }
+
+    return response;
   }
 }
 
