@@ -42,6 +42,15 @@ export interface BoardSize {
   cols: number;
 }
 
+export interface Synergy {
+  id: string;
+  name: string;
+  abbreviation: string;
+  count: number;
+  max: number;
+  color: string;
+}
+
 export interface Position {
   row: number;
   col: number;
@@ -57,7 +66,7 @@ export interface Unit {
   need3Star?: boolean; // Cần lên 3 sao
   position: Position;
   image?: string;
-  items?: string[]; // Array of item apiNames
+  items?: string[]; // Array of item IDs
   itemsDetails?: Array<{ // Populated items
     id: string | number;
     apiName?: string | null;
@@ -66,11 +75,6 @@ export interface Unit {
     tag?: string | null;
     unique?: boolean | null;
   }>;
-}
-
-export interface Augment {
-  name: string;
-  tier: number; // 1, 2, hoặc 3
 }
 
 export interface CarryItem {
@@ -92,15 +96,11 @@ export interface Composition {
   isLateGame?: boolean;
   tier?: string; // S, A, B, C, D
   boardSize: BoardSize;
+  synergies: Synergy[];
   units: Unit[];
-  earlyGame?: Unit[];
-  midGame?: Unit[];
   bench?: Unit[];
   carryItems?: CarryItem[];
   notes?: string[];
-  carouselPriority?: number;
-  augments?: Augment[];
-  coreChampion?: Unit;
   createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date;
@@ -115,15 +115,11 @@ export interface CreateCompositionDto {
   isLateGame?: boolean;
   tier?: string; // S, A, B, C, D
   boardSize: BoardSize;
+  synergies: Synergy[];
   units: Unit[];
-  earlyGame?: Unit[];
-  midGame?: Unit[];
   bench?: Unit[];
   carryItems?: CarryItem[];
   notes?: string[];
-  carouselPriority?: number;
-  augments?: Augment[];
-  coreChampion?: Unit;
 }
 
 export interface UpdateCompositionDto extends Partial<CreateCompositionDto> {}
@@ -183,24 +179,6 @@ export interface Item {
   icon?: string | null;
   tag?: string | null;
   unique?: boolean | null;
-}
-
-export interface TftAugment {
-  id: string | number;
-  apiName: string;
-  name: string;
-  enName?: string | null;
-  desc?: string | null;
-  icon?: string | null;
-  associatedTraits?: string[];
-  incompatibleTraits?: string[];
-  composition?: string[];
-  effects?: Record<string, any>;
-  tags?: string[];
-  unique?: boolean;
-  from?: string | null;
-  augmentId?: string | null;
-  disabled?: boolean;
 }
 
 class ApiClient {
@@ -341,13 +319,6 @@ class ApiClient {
     });
   }
 
-  async parseMobalyticsHTML(html: string): Promise<CreateCompositionDto> {
-    return this.request<CreateCompositionDto>('/compositions/parse-mobalytics-html', {
-      method: 'POST',
-      body: JSON.stringify({ html }),
-    });
-  }
-
   // TFT Units API
   async getAllUnits(): Promise<TftUnit[]> {
     return this.request<TftUnit[]>('/tft-units/list-all');
@@ -366,16 +337,7 @@ class ApiClient {
   async getAllItems(): Promise<Item[]> {
     // Lấy tất cả items với limit lớn
     const response = await this.request<PaginationResponse<Item>>(
-      '/tft-items?limit=1000&orderBy=name&order=asc'
-    );
-    return response.data;
-  }
-
-  // TFT Augments API
-  async getAllAugments(): Promise<TftAugment[]> {
-    // Lấy tất cả augments với limit lớn
-    const response = await this.request<PaginationResponse<TftAugment>>(
-      '/tft-augments?limit=1000&orderBy=name&order=asc'
+      '/items?limit=1000&orderBy=name&order=asc'
     );
     return response.data;
   }

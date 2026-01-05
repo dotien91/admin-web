@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { apiClient, Composition, UpdateCompositionDto, Unit, TftUnit, TftTrait } from '@/lib/api';
-import { useItems } from '@/lib/items-context';
+import { apiClient, Composition, UpdateCompositionDto, Synergy, Unit, TftUnit, TftTrait, Item } from '@/lib/api';
 
 export default function EditCompositionPage() {
   const router = useRouter();
@@ -18,9 +17,8 @@ export default function EditCompositionPage() {
   const [loadingUnits, setLoadingUnits] = useState(true);
   const [traits, setTraits] = useState<TftTrait[]>([]);
   const [loadingTraits, setLoadingTraits] = useState(true);
-  
-  // Sử dụng items từ context thay vì fetch riêng
-  const { items, loading: loadingItems } = useItems();
+  const [items, setItems] = useState<Item[]>([]);
+  const [loadingItems, setLoadingItems] = useState(true);
 
   useEffect(() => {
     const fetchComposition = async () => {
@@ -59,11 +57,24 @@ export default function EditCompositionPage() {
       }
     };
 
+    const fetchItems = async () => {
+      try {
+        setLoadingItems(true);
+        const data = await apiClient.getAllItems();
+        setItems(data);
+      } catch (err) {
+        console.error('Error fetching items:', err);
+      } finally {
+        setLoadingItems(false);
+      }
+    };
+
     if (id) {
       fetchComposition();
     }
     fetchUnits();
     fetchTraits();
+    fetchItems();
   }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -74,7 +85,8 @@ export default function EditCompositionPage() {
     setError(null);
 
     try {
-      const dataToSend = composition;
+      // Không gửi synergies, để API tự tính toán lại từ units
+      const { synergies, ...dataToSend } = composition;
       const updateData: UpdateCompositionDto = {
         compId: composition.compId,
         name: composition.name,
@@ -85,11 +97,10 @@ export default function EditCompositionPage() {
         tier: composition.tier,
         boardSize: composition.boardSize,
         units: composition.units,
-        earlyGame: composition.earlyGame,
-        midGame: composition.midGame,
         bench: composition.bench,
         carryItems: composition.carryItems,
         notes: composition.notes,
+        synergies: undefined, // Không gửi để API tự tính lại
       };
 
       await apiClient.updateComposition(id, updateData);
@@ -106,6 +117,62 @@ export default function EditCompositionPage() {
     setComposition({ ...composition, [field]: value });
   };
 
+  const updateSynergy = (index: number, field: keyof Synergy, value: any) => {
+    if (!composition) return;
+    setComposition({
+      ...composition,
+      synergies: composition.synergies.map((s, i) =>
+        i === index ? { ...s, [field]: value } : s
+      ),
+    });
+  };
+
+  const removeSynergy = (index: number) => {
+    if (!composition) return;
+    setComposition({
+      ...composition,
+      synergies: composition.synergies.filter((_, i) => i !== index),
+    });
+  };
+
+  const addSynergy = () => {
+    if (!composition) return;
+    setComposition({
+      ...composition,
+      synergies: [
+        ...composition.synergies,
+        { id: '', name: '', abbreviation: '', count: 0, max: 0, color: '#000000' },
+      ],
+    });
+  };
+
+  const handleSynergySelect = (index: number, traitId: string) => {
+    if (!composition) return;
+    const selectedTrait = traits.find((t) => t.id.toString() === traitId);
+    if (selectedTrait) {
+      // Tạo abbreviation từ name (lấy 2-3 chữ cái đầu)
+      const abbreviation = selectedTrait.name
+        .split(' ')
+        .map((word) => word[0])
+        .join('')
+        .substring(0, 3)
+        .toUpperCase();
+
+      setComposition({
+        ...composition,
+        synergies: composition.synergies.map((s, i) =>
+          i === index
+            ? {
+                ...s,
+                id: selectedTrait.apiName || selectedTrait.name.toLowerCase().replace(/\s+/g, '-'),
+                name: selectedTrait.name,
+                abbreviation: abbreviation,
+              }
+            : s
+        ),
+      });
+    }
+  };
 
   const updateUnit = (index: number, field: keyof Unit, value: any) => {
     if (!composition) return;
@@ -164,145 +231,6 @@ export default function EditCompositionPage() {
             : u
         ),
       });
-    }
-  };
-
-  // Early Game functions
-  const addEarlyGameUnit = () => {
-    if (!composition) return;
-    setComposition({
-      ...composition,
-      earlyGame: [
-        ...(composition.earlyGame || []),
-        {
-          championId: '',
-          championKey: '',
-          name: '',
-          cost: 1,
-          star: 1,
-          need3Star: false,
-          position: { row: 0, col: 0 },
-          items: [],
-        },
-      ],
-    });
-  };
-
-  const updateEarlyGameUnit = (index: number, field: keyof Unit, value: any) => {
-    if (!composition) return;
-    setComposition({
-      ...composition,
-      earlyGame: (composition.earlyGame || []).map((u, i) =>
-        i === index ? { ...u, [field]: value } : u
-      ),
-    });
-  };
-
-  const handleEarlyGameUnitSelect = (index: number, unitId: string) => {
-    if (!composition) return;
-    const selectedUnit = units.find((u) => u.id.toString() === unitId);
-    if (selectedUnit) {
-      setComposition({
-        ...composition,
-        earlyGame: (composition.earlyGame || []).map((u, i) =>
-          i === index
-            ? {
-                ...u,
-                championId: selectedUnit.id.toString(),
-                championKey: selectedUnit.apiName || selectedUnit.name.toLowerCase(),
-                name: selectedUnit.name,
-                cost: selectedUnit.cost || 1,
-                image: selectedUnit.icon || selectedUnit.squareIcon || undefined,
-              }
-            : u
-        ),
-      });
-    }
-  };
-
-  const removeEarlyGameUnit = (index: number) => {
-    if (!composition) return;
-    setComposition({
-      ...composition,
-      earlyGame: (composition.earlyGame || []).filter((_, i) => i !== index),
-    });
-  };
-
-  // Mid Game functions
-  const addMidGameUnit = () => {
-    if (!composition) return;
-    setComposition({
-      ...composition,
-      midGame: [
-        ...(composition.midGame || []),
-        {
-          championId: '',
-          championKey: '',
-          name: '',
-          cost: 1,
-          star: 1,
-          need3Star: false,
-          position: { row: 0, col: 0 },
-          items: [],
-        },
-      ],
-    });
-  };
-
-  const updateMidGameUnit = (index: number, field: keyof Unit, value: any) => {
-    if (!composition) return;
-    setComposition({
-      ...composition,
-      midGame: (composition.midGame || []).map((u, i) =>
-        i === index ? { ...u, [field]: value } : u
-      ),
-    });
-  };
-
-  const handleMidGameUnitSelect = (index: number, unitId: string) => {
-    if (!composition) return;
-    const selectedUnit = units.find((u) => u.id.toString() === unitId);
-    if (selectedUnit) {
-      setComposition({
-        ...composition,
-        midGame: (composition.midGame || []).map((u, i) =>
-          i === index
-            ? {
-                ...u,
-                championId: selectedUnit.id.toString(),
-                championKey: selectedUnit.apiName || selectedUnit.name.toLowerCase(),
-                name: selectedUnit.name,
-                cost: selectedUnit.cost || 1,
-                image: selectedUnit.icon || selectedUnit.squareIcon || undefined,
-              }
-            : u
-        ),
-      });
-    }
-  };
-
-  const removeMidGameUnit = (index: number) => {
-    if (!composition) return;
-    setComposition({
-      ...composition,
-      midGame: (composition.midGame || []).filter((_, i) => i !== index),
-    });
-  };
-
-  // Helper function để tạo URL ảnh item từ apiName
-  const getItemImageUrl = (apiName: string): string => {
-    // Chuyển apiName thành lowercase
-    const lowerApiName = apiName.toLowerCase();
-    return `https://cdn.metatft.com/cdn-cgi/image/width=48,height=48,format=auto/https://cdn.metatft.com/file/metatft/items/${lowerApiName}.png`;
-  };
-
-  // Toggle item selection
-  const toggleItem = (unitItems: string[], itemApiName: string, updateFn: (items: string[]) => void) => {
-    const isSelected = unitItems.includes(itemApiName);
-    if (isSelected) {
-      updateFn(unitItems.filter(apiName => apiName !== itemApiName));
-    } else {
-      updateFn([...unitItems, itemApiName]);
     }
   };
 
@@ -449,7 +377,7 @@ export default function EditCompositionPage() {
           </div>
 
           {/* Board Size - Mặc định 4x7, ẩn form */}
-          {false && (
+          {false && composition && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-black dark:text-zinc-50">Kích thước bàn cờ</h2>
             <div className="grid grid-cols-2 gap-4">
@@ -461,9 +389,9 @@ export default function EditCompositionPage() {
                   type="number"
                   required
                   min="1"
-                  value={composition.boardSize.rows}
+                  value={composition?.boardSize?.rows ?? 4}
                   onChange={(e) =>
-                    updateField('boardSize', {
+                    composition && composition.boardSize && updateField('boardSize', {
                       ...composition.boardSize,
                       rows: parseInt(e.target.value),
                     })
@@ -479,9 +407,9 @@ export default function EditCompositionPage() {
                   type="number"
                   required
                   min="1"
-                  value={composition.boardSize.cols}
+                  value={composition?.boardSize?.cols ?? 7}
                   onChange={(e) =>
-                    updateField('boardSize', {
+                    composition && composition.boardSize && updateField('boardSize', {
                       ...composition.boardSize,
                       cols: parseInt(e.target.value),
                     })
@@ -493,33 +421,58 @@ export default function EditCompositionPage() {
           </div>
           )}
 
-
-          {/* Early Game Units */}
+          {/* Synergies - Tự động tính toán từ units */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-xl font-semibold text-black dark:text-zinc-50">Đội hình đầu game</h2>
+                <h2 className="text-xl font-semibold text-black dark:text-zinc-50">Synergies</h2>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-                  Đội hình sử dụng ở giai đoạn đầu game (tùy chọn)
+                  Synergies sẽ được tự động tính toán lại từ units khi lưu
                 </p>
               </div>
+            </div>
+            {composition.synergies && composition.synergies.length > 0 && (
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">
+                  <strong>Synergies hiện tại:</strong>
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {composition.synergies.map((synergy, idx) => (
+                    <span
+                      key={idx}
+                      className="px-3 py-1 bg-blue-100 dark:bg-blue-900/40 rounded text-sm text-blue-800 dark:text-blue-200"
+                    >
+                      {synergy.name} ({synergy.count}/{synergy.max})
+                    </span>
+                  ))}
+                </div>
+                <p className="text-xs text-blue-700 dark:text-blue-300 mt-2">
+                  * Synergies này sẽ được tính toán lại tự động khi bạn lưu
+                </p>
+              </div>
+            )}
+            {/* Ẩn phần chỉnh sửa synergies */}
+            {false && (
+            <div className="flex justify-between items-center">
               <button
                 type="button"
-                onClick={addEarlyGameUnit}
+                onClick={addSynergy}
                 className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-black dark:text-zinc-50 rounded-lg hover:bg-zinc-300 dark:hover:bg-zinc-600"
               >
-                + Thêm Unit
+                + Thêm Synergy
               </button>
             </div>
-            {(composition.earlyGame || []).map((unit, index) => (
+            )}
+            {/* Synergies được tính tự động, không cần chỉnh sửa */}
+            {false && composition?.synergies?.map((synergy, index) => (
               <div key={index} className="border border-zinc-300 dark:border-zinc-700 rounded-lg p-4 space-y-3">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                    Unit đầu game {index + 1}
+                    Synergy {index + 1}
                   </span>
                   <button
                     type="button"
-                    onClick={() => removeEarlyGameUnit(index)}
+                    onClick={() => removeSynergy(index)}
                     className="text-red-600 dark:text-red-400 hover:text-red-800"
                   >
                     Xóa
@@ -528,46 +481,34 @@ export default function EditCompositionPage() {
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
-                      Chọn Unit *
+                      Chọn Trait *
                     </label>
                     <select
-                      value={unit.championId || ''}
-                      onChange={(e) => handleEarlyGameUnitSelect(index, e.target.value)}
+                      value={synergy.id || ''}
+                      onChange={(e) => handleSynergySelect(index, e.target.value)}
                       className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
-                      disabled={loadingUnits}
+                      disabled={loadingTraits}
                     >
-                      <option value="">-- Chọn unit --</option>
-                      {units.map((u) => (
-                        <option key={u.id} value={u.id.toString()}>
-                          {u.name} {u.cost ? `(${u.cost} cost)` : ''} - {u.apiName}
+                      <option value="">-- Chọn trait --</option>
+                      {traits.map((t) => (
+                        <option key={t.id} value={t.id.toString()}>
+                          {t.name} - {t.apiName}
                         </option>
                       ))}
                     </select>
-                    {loadingUnits && (
-                      <p className="text-xs text-zinc-500 mt-1">Đang tải danh sách units...</p>
+                    {loadingTraits && (
+                      <p className="text-xs text-zinc-500 mt-1">Đang tải danh sách traits...</p>
                     )}
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
-                        Champion ID
+                        ID
                       </label>
                       <input
                         type="text"
-                        value={unit.championId}
-                        onChange={(e) => updateEarlyGameUnit(index, 'championId', e.target.value)}
-                        className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
-                        Champion Key
-                      </label>
-                      <input
-                        type="text"
-                        value={unit.championKey}
-                        onChange={(e) => updateEarlyGameUnit(index, 'championKey', e.target.value)}
+                        value={synergy.id}
+                        onChange={(e) => updateSynergy(index, 'id', e.target.value)}
                         className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
                         readOnly
                       />
@@ -578,135 +519,60 @@ export default function EditCompositionPage() {
                       </label>
                       <input
                         type="text"
-                        value={unit.name}
-                        onChange={(e) => updateEarlyGameUnit(index, 'name', e.target.value)}
+                        value={synergy.name}
+                        onChange={(e) => updateSynergy(index, 'name', e.target.value)}
                         className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
                         readOnly
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
-                        Cost
+                        Viết tắt
+                      </label>
+                      <input
+                        type="text"
+                        value={synergy.abbreviation}
+                        onChange={(e) => updateSynergy(index, 'abbreviation', e.target.value)}
+                        className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
+                        readOnly
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
+                        Màu sắc
+                      </label>
+                      <input
+                        type="color"
+                        value={synergy.color}
+                        onChange={(e) => updateSynergy(index, 'color', e.target.value)}
+                        className="w-full h-10 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
+                        Count *
                       </label>
                       <input
                         type="number"
-                        min="1"
-                        value={unit.cost}
-                        onChange={(e) => updateEarlyGameUnit(index, 'cost', parseInt(e.target.value) || 1)}
+                        required
+                        min="0"
+                        value={synergy.count}
+                        onChange={(e) => updateSynergy(index, 'count', parseInt(e.target.value) || 0)}
                         className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
                       />
                     </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 border-t border-b border-zinc-200 dark:border-zinc-700 py-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
-                        Star *
+                      <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
+                        Max *
                       </label>
                       <input
                         type="number"
-                        min="1"
-                        max="3"
-                        value={unit.star}
-                        onChange={(e) => updateEarlyGameUnit(index, 'star', parseInt(e.target.value) || 1)}
-                        className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
                         required
+                        min="0"
+                        value={synergy.max}
+                        onChange={(e) => updateSynergy(index, 'max', parseInt(e.target.value) || 0)}
+                        className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
                       />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
-                        Items
-                      </label>
-                      {loadingItems ? (
-                        <p className="text-xs text-zinc-500 mt-1">Đang tải danh sách items...</p>
-                      ) : (
-                        <div className="border border-zinc-300 dark:border-zinc-700 rounded-lg p-3 bg-white dark:bg-zinc-800 max-h-[200px] overflow-y-auto">
-                          <div className="grid grid-cols-6 gap-2">
-                            {items.map((item) => {
-                              const itemApiName = item.apiName;
-                              const isSelected = (unit.items || []).includes(itemApiName);
-                              return (
-                                <button
-                                  key={item.id}
-                                  type="button"
-                                  onClick={() => toggleItem(unit.items || [], itemApiName, (items) => updateEarlyGameUnit(index, 'items', items))}
-                                  className={`relative p-1 rounded border-2 transition-all ${
-                                    isSelected
-                                      ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
-                                      : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600'
-                                  }`}
-                                  title={item.name}
-                                >
-                                  <img
-                                    src={getItemImageUrl(item.apiName)}
-                                    alt={item.name}
-                                    className="w-full h-auto"
-                                    onError={(e) => {
-                                      // Fallback nếu ảnh không load được
-                                      (e.target as HTMLImageElement).src = getItemImageUrl(item.apiName);
-                                    }}
-                                  />
-                                  {isSelected && (
-                                    <div className="absolute top-0 right-0 bg-blue-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
-                                      ✓
-                                    </div>
-                                  )}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-                      <p className="text-xs text-zinc-500 mt-1">
-                        Click vào ảnh để chọn/bỏ chọn items
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex gap-2">
-                      <div className="flex-1">
-                        <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
-                          Row
-                        </label>
-                        <input
-                          type="number"
-                          value={unit.position.row}
-                          onChange={(e) =>
-                            updateEarlyGameUnit(index, 'position', {
-                              ...unit.position,
-                              row: parseInt(e.target.value) || 0,
-                            })
-                          }
-                          className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
-                          Col
-                        </label>
-                        <input
-                          type="number"
-                          value={unit.position.col}
-                          onChange={(e) =>
-                            updateEarlyGameUnit(index, 'position', {
-                              ...unit.position,
-                              col: parseInt(e.target.value) || 0,
-                            })
-                          }
-                          className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id={`earlyGame-need3Star-${index}`}
-                        checked={unit.need3Star || false}
-                        onChange={(e) => updateEarlyGameUnit(index, 'need3Star', e.target.checked)}
-                        className="w-4 h-4"
-                      />
-                      <label htmlFor={`earlyGame-need3Star-${index}`} className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                        Cần lên 3 sao
-                      </label>
                     </div>
                   </div>
                 </div>
@@ -714,235 +580,10 @@ export default function EditCompositionPage() {
             ))}
           </div>
 
-          {/* Mid Game Units */}
+          {/* Units */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-semibold text-black dark:text-zinc-50">Đội hình giữa game</h2>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-                  Đội hình sử dụng ở giai đoạn giữa game (tùy chọn)
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={addMidGameUnit}
-                className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-black dark:text-zinc-50 rounded-lg hover:bg-zinc-300 dark:hover:bg-zinc-600"
-              >
-                + Thêm Unit
-              </button>
-            </div>
-            {(composition.midGame || []).map((unit, index) => (
-              <div key={index} className="border border-zinc-300 dark:border-zinc-700 rounded-lg p-4 space-y-3">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                    Unit giữa game {index + 1}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => removeMidGameUnit(index)}
-                    className="text-red-600 dark:text-red-400 hover:text-red-800"
-                  >
-                    Xóa
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
-                      Chọn Unit *
-                    </label>
-                    <select
-                      value={unit.championId || ''}
-                      onChange={(e) => handleMidGameUnitSelect(index, e.target.value)}
-                      className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
-                      disabled={loadingUnits}
-                    >
-                      <option value="">-- Chọn unit --</option>
-                      {units.map((u) => (
-                        <option key={u.id} value={u.id.toString()}>
-                          {u.name} {u.cost ? `(${u.cost} cost)` : ''} - {u.apiName}
-                        </option>
-                      ))}
-                    </select>
-                    {loadingUnits && (
-                      <p className="text-xs text-zinc-500 mt-1">Đang tải danh sách units...</p>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
-                        Champion ID
-                      </label>
-                      <input
-                        type="text"
-                        value={unit.championId}
-                        onChange={(e) => updateMidGameUnit(index, 'championId', e.target.value)}
-                        className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
-                        Champion Key
-                      </label>
-                      <input
-                        type="text"
-                        value={unit.championKey}
-                        onChange={(e) => updateMidGameUnit(index, 'championKey', e.target.value)}
-                        className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
-                        Tên
-                      </label>
-                      <input
-                        type="text"
-                        value={unit.name}
-                        onChange={(e) => updateMidGameUnit(index, 'name', e.target.value)}
-                        className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
-                        Cost
-                      </label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={unit.cost}
-                        onChange={(e) => updateMidGameUnit(index, 'cost', parseInt(e.target.value) || 1)}
-                        className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 border-t border-b border-zinc-200 dark:border-zinc-700 py-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
-                        Star *
-                      </label>
-                      <input
-                        type="number"
-                        min="1"
-                        max="3"
-                        value={unit.star}
-                        onChange={(e) => updateMidGameUnit(index, 'star', parseInt(e.target.value) || 1)}
-                        className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
-                        Items
-                      </label>
-                      {loadingItems ? (
-                        <p className="text-xs text-zinc-500 mt-1">Đang tải danh sách items...</p>
-                      ) : (
-                        <div className="border border-zinc-300 dark:border-zinc-700 rounded-lg p-3 bg-white dark:bg-zinc-800 max-h-[200px] overflow-y-auto">
-                          <div className="grid grid-cols-6 gap-2">
-                            {items.map((item) => {
-                              const itemApiName = item.apiName;
-                              const isSelected = (unit.items || []).includes(itemApiName);
-                              return (
-                                <button
-                                  key={item.id}
-                                  type="button"
-                                  onClick={() => toggleItem(unit.items || [], itemApiName, (items) => updateMidGameUnit(index, 'items', items))}
-                                  className={`relative p-1 rounded border-2 transition-all ${
-                                    isSelected
-                                      ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
-                                      : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600'
-                                  }`}
-                                  title={item.name}
-                                >
-                                  <img
-                                    src={getItemImageUrl(item.apiName)}
-                                    alt={item.name}
-                                    className="w-full h-auto"
-                                    onError={(e) => {
-                                      // Fallback nếu ảnh không load được
-                                      (e.target as HTMLImageElement).src = getItemImageUrl(item.apiName);
-                                    }}
-                                  />
-                                  {isSelected && (
-                                    <div className="absolute top-0 right-0 bg-blue-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
-                                      ✓
-                                    </div>
-                                  )}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-                      <p className="text-xs text-zinc-500 mt-1">
-                        Click vào ảnh để chọn/bỏ chọn items
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex gap-2">
-                      <div className="flex-1">
-                        <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
-                          Row
-                        </label>
-                        <input
-                          type="number"
-                          value={unit.position.row}
-                          onChange={(e) =>
-                            updateMidGameUnit(index, 'position', {
-                              ...unit.position,
-                              row: parseInt(e.target.value) || 0,
-                            })
-                          }
-                          className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-xs font-medium mb-1 text-zinc-600 dark:text-zinc-400">
-                          Col
-                        </label>
-                        <input
-                          type="number"
-                          value={unit.position.col}
-                          onChange={(e) =>
-                            updateMidGameUnit(index, 'position', {
-                              ...unit.position,
-                              col: parseInt(e.target.value) || 0,
-                            })
-                          }
-                          className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id={`midGame-need3Star-${index}`}
-                        checked={unit.need3Star || false}
-                        onChange={(e) => updateMidGameUnit(index, 'need3Star', e.target.checked)}
-                        className="w-4 h-4"
-                      />
-                      <label htmlFor={`midGame-need3Star-${index}`} className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                        Cần lên 3 sao
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Units (End Game) */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-semibold text-black dark:text-zinc-50">Đội hình cuối game *</h2>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-                  Đội hình sử dụng ở giai đoạn cuối game (bắt buộc)
-                </p>
-              </div>
+              <h2 className="text-xl font-semibold text-black dark:text-zinc-50">Units *</h2>
               <button
                 type="button"
                 onClick={addUnit}
@@ -1059,66 +700,37 @@ export default function EditCompositionPage() {
                       <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
                         Items
                       </label>
-                      {loadingItems ? (
+                      <select
+                        multiple
+                        value={unit.items || []}
+                        onChange={(e) => {
+                          const selectedItems = Array.from(e.target.selectedOptions, option => option.value);
+                          updateUnit(index, 'items', selectedItems);
+                        }}
+                        className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 text-sm min-h-[100px] focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+                        disabled={loadingItems}
+                      >
+                        {items.map((item) => (
+                          <option key={item.id} value={item.id.toString()}>
+                            {item.name} {item.apiName ? `(${item.apiName})` : ''}
+                          </option>
+                        ))}
+                      </select>
+                      {loadingItems && (
                         <p className="text-xs text-zinc-500 mt-1">Đang tải danh sách items...</p>
-                      ) : (
-                        <div className="border border-zinc-300 dark:border-zinc-700 rounded-lg p-3 bg-white dark:bg-zinc-800 max-h-[200px] overflow-y-auto">
-                          <div className="grid grid-cols-6 gap-2">
-                            {items.map((item) => {
-                              const itemApiName = item.apiName;
-                              const isSelected = (unit.items || []).includes(itemApiName);
-                              return (
-                                <button
-                                  key={item.id}
-                                  type="button"
-                                  onClick={() => toggleItem(unit.items || [], itemApiName, (items) => updateUnit(index, 'items', items))}
-                                  className={`relative p-1 rounded border-2 transition-all ${
-                                    isSelected
-                                      ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
-                                      : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600'
-                                  }`}
-                                  title={item.name}
-                                >
-                                  <img
-                                    src={getItemImageUrl(item.apiName)}
-                                    alt={item.name}
-                                    className="w-full h-auto"
-                                    onError={(e) => {
-                                      // Fallback nếu ảnh không load được
-                                      (e.target as HTMLImageElement).src = getItemImageUrl(item.apiName);
-                                    }}
-                                  />
-                                  {isSelected && (
-                                    <div className="absolute top-0 right-0 bg-blue-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
-                                      ✓
-                                    </div>
-                                  )}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
                       )}
                       <p className="text-xs text-zinc-500 mt-1">
-                        Click vào ảnh để chọn/bỏ chọn items
+                        Giữ Ctrl/Cmd để chọn nhiều items
                       </p>
                       {unit.items && unit.items.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-2">
-                          {unit.items.map((itemApiName) => {
-                            const item = items.find((i) => i.apiName === itemApiName);
+                          {unit.items.map((itemId) => {
+                            const item = items.find((i) => i.id.toString() === itemId);
                             return item ? (
                               <span
-                                key={itemApiName}
-                                className="px-2 py-1 bg-blue-100 dark:bg-blue-900/40 rounded text-xs text-blue-800 dark:text-blue-200 flex items-center gap-1"
+                                key={itemId}
+                                className="px-2 py-1 bg-blue-100 dark:bg-blue-900/40 rounded text-xs text-blue-800 dark:text-blue-200"
                               >
-                                <img
-                                  src={getItemImageUrl(item.apiName)}
-                                  alt={item.name}
-                                  className="w-4 h-4"
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).src = getItemImageUrl(item.apiName);
-                                  }}
-                                />
                                 {item.name}
                               </span>
                             ) : null;
