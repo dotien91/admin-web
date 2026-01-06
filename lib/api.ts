@@ -181,6 +181,16 @@ export interface Item {
   unique?: boolean | null;
 }
 
+export interface TftAugment {
+  id: string | number;
+  apiName: string;
+  name: string;
+  enName?: string | null;
+  desc?: string | null;
+  icon?: string | null;
+  tier?: number | null;
+}
+
 class ApiClient {
   private baseUrl: string;
   private token: string | null = null;
@@ -319,6 +329,14 @@ class ApiClient {
     });
   }
 
+  // Parse Mobalytics HTML
+  async parseMobalyticsHTML(html: string): Promise<CreateCompositionDto> {
+    return this.request<CreateCompositionDto>('/compositions/parse-mobalytics-html', {
+      method: 'POST',
+      body: JSON.stringify({ html }),
+    });
+  }
+
   // TFT Units API
   async getAllUnits(): Promise<TftUnit[]> {
     return this.request<TftUnit[]>('/tft-units/list-all');
@@ -338,6 +356,15 @@ class ApiClient {
     // Lấy tất cả items với limit lớn
     const response = await this.request<PaginationResponse<Item>>(
       '/items?limit=1000&orderBy=name&order=asc'
+    );
+    return response.data;
+  }
+
+  // TFT Augments API
+  async getAllAugments(): Promise<TftAugment[]> {
+    // Lấy tất cả augments với limit lớn
+    const response = await this.request<PaginationResponse<TftAugment>>(
+      '/tft-augments?limit=1000&orderBy=name&order=asc'
     );
     return response.data;
   }
