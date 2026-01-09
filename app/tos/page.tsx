@@ -31,22 +31,32 @@ export default function TermsOfServicePage() {
               <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
                 2. Legal Disclaimer (Riot Games)
               </h2>
+              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+                TFTBuddy is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends or Teamfight Tactics.
+              </p>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                TFTBuddy isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.
+                League of Legends, Teamfight Tactics, and Riot Games are trademarks or registered trademarks of Riot Games, Inc.
+              </p>
+              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mt-2">
+                © Riot Games, Inc. All rights reserved.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
-                3. Use License
+                3. License and Acceptable Use
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                We grant you a limited, non-exclusive, non-transferable license to use the app for personal, non-commercial purposes only. You agree not to:
+                We grant you a limited, non-exclusive, non-transferable, and revocable license to use TFTBuddy for personal and non-commercial purposes.
+              </p>
+              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
+                You agree not to:
               </p>
               <ul className="list-disc list-inside space-y-1 text-zinc-700 dark:text-zinc-300 ml-4">
-                <li>Modify, copy, or reverse engineer the app.</li>
-                <li>Use the app for any commercial purpose or public display.</li>
-                <li>Attempt to circumvent any technical limitations in the software.</li>
+                <li>Copy, modify, or reverse engineer the app.</li>
+                <li>Use the app for unlawful purposes.</li>
+                <li>Attempt to interfere with or bypass security or technical safeguards.</li>
+                <li>Use automated systems to access or scrape the app's content.</li>
               </ul>
             </section>
 
@@ -54,35 +64,74 @@ export default function TermsOfServicePage() {
               <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
                 4. Intellectual Property
               </h2>
+              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
+                All original content, features, and functionality of TFTBuddy (excluding third-party content and Riot Games' assets) are the exclusive property of TFTBuddy and its licensors.
+              </p>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                The app's original content (excluding Riot Games' assets), features, and functionality are and will remain the exclusive property of TFTBuddy and its licensors.
+                Third-party trademarks and assets remain the property of their respective owners.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
-                5. Limitation of Liability
+                5. Data Accuracy Disclaimer
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                TFTBuddy is provided on an "AS IS" and "AS AVAILABLE" basis. We make no warranties that the data provided (stats, tier lists, or guides) is 100% accurate or up-to-date. In no event shall the developers be liable for any damages arising from the use of this app.
+                TFTBuddy provides game-related data such as statistics, tier lists, and guides for informational purposes only. While we strive for accuracy, we do not guarantee that the information is complete, accurate, or up to date.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
-                6. Governing Law
+                6. Limitation of Liability
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                These terms shall be governed and construed in accordance with the laws of Viet Nam, without regard to its conflict of law provisions.
+                TFTBuddy is provided on an "AS IS" and "AS AVAILABLE" basis. To the fullest extent permitted by law, TFTBuddy and its developers shall not be liable for any indirect, incidental, or consequential damages arising from the use or inability to use the app.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
-                7. Contact Us
+                7. Termination
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                If you have any questions about these Terms, please contact: apporastudio@gmail.com.
+                We reserve the right to suspend or terminate access to TFTBuddy at any time, without prior notice, if you violate these Terms or misuse the application.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
+                8. Changes to These Terms
+              </h2>
+              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                We may update these Terms of Service from time to time. Continued use of the app after changes are posted constitutes your acceptance of the revised terms.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
+                9. Governing Law
+              </h2>
+              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                These Terms shall be governed and construed in accordance with the laws of Viet Nam, without regard to conflict of law principles.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
+                10. Contact Us
+              </h2>
+              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                If you have any questions about these Terms of Service, please contact us at:
+              </p>
+              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mt-2">
+                📧{" "}
+                <a
+                  href="mailto:apporastudio@gmail.com"
+                  className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                >
+                  apporastudio@gmail.com
+                </a>
               </p>
             </section>
           </div>
