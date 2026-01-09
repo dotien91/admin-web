@@ -40,10 +40,10 @@ export default function TermsOfServicePage() {
               <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
                 3. Use License
               </h2>
-              <p className="text-zinc-700 dark:text-zinc-300 mb-3">
+              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
                 We grant you a limited, non-exclusive, non-transferable license to use the app for personal, non-commercial purposes only. You agree not to:
               </p>
-              <ul className="list-disc list-inside space-y-2 text-zinc-700 dark:text-zinc-300 ml-4">
+              <ul className="list-disc list-inside space-y-1 text-zinc-700 dark:text-zinc-300 ml-4">
                 <li>Modify, copy, or reverse engineer the app.</li>
                 <li>Use the app for any commercial purpose or public display.</li>
                 <li>Attempt to circumvent any technical limitations in the software.</li>
@@ -82,14 +82,7 @@ export default function TermsOfServicePage() {
                 7. Contact Us
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                If you have any questions about these Terms, please contact:{" "}
-                <a
-                  href="mailto:apporastudio@gmail.com"
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
-                >
-                  apporastudio@gmail.com
-                </a>
-                .
+                If you have any questions about these Terms, please contact: apporastudio@gmail.com.
               </p>
             </section>
           </div>
