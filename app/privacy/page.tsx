@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - TFTBuddy",
-  description: "Privacy Policy for TFTBuddy mobile application",
+  title: "Privacy Policy - ChessBuddy",
+  description: "Privacy Policy for ChessBuddy mobile application",
 };
 
 export default function PrivacyPolicyPage() {
@@ -23,13 +23,13 @@ export default function PrivacyPolicyPage() {
                 1. Introduction
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
-                Welcome to TFTBuddy.
+                Welcome to ChessBuddy.
               </p>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
                 We respect your privacy and are committed to protecting your information. This Privacy Policy explains how we collect, use, and safeguard information when you use our mobile application.
               </p>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mt-4">
-                By using TFTBuddy, you agree to the practices described in this Privacy Policy.
+                By using ChessBuddy, you agree to the practices described in this Privacy Policy.
               </p>
             </section>
 
@@ -147,7 +147,7 @@ export default function PrivacyPolicyPage() {
                 7. Children’s Privacy
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                TFTBuddy does not knowingly collect personal information from children under the age of 13. If you believe such information has been collected, please contact us and we will take appropriate action.
+                ChessBuddy does not knowingly collect personal information from children under the age of 13. If you believe such information has been collected, please contact us and we will take appropriate action.
               </p>
             </section>
 

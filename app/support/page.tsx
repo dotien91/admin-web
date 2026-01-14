@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Support - TFTBuddy",
-  description: "Customer support and contact information for TFTBuddy mobile application",
+  title: "Support - ChessBuddy",
+  description: "Customer support and contact information for ChessBuddy mobile application",
 };
 
 export default function SupportPage() {
@@ -23,7 +23,7 @@ export default function SupportPage() {
                 Contact Us
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
-                If you're experiencing any issues with TFTBuddy, have suggestions for improvement, or need assistance, our support team is here to help.
+                If you're experiencing any issues with ChessBuddy, have suggestions for improvement, or need assistance, our support team is here to help.
               </p>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
                 Please reach out to us via email and we'll get back to you as soon as possible.

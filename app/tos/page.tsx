@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service - TFTBuddy",
-  description: "Terms of Service for TFTBuddy mobile application",
+  title: "Terms of Service - ChessBuddy",
+  description: "Terms of Service for ChessBuddy mobile application",
 };
 
 export default function TermsOfServicePage() {
@@ -23,7 +23,7 @@ export default function TermsOfServicePage() {
                 1. Acceptance of Terms
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                By downloading, installing, or using TFTBuddy, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the application.
+                By downloading, installing, or using ChessBuddy, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the application.
               </p>
             </section>
 
@@ -32,7 +32,7 @@ export default function TermsOfServicePage() {
                 2. Legal Disclaimer (Riot Games)
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
-                TFTBuddy is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends or Teamfight Tactics.
+                ChessBuddy is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends or Teamfight Tactics.
               </p>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
                 League of Legends, Teamfight Tactics, and Riot Games are trademarks or registered trademarks of Riot Games, Inc.
@@ -47,7 +47,7 @@ export default function TermsOfServicePage() {
                 3. License and Acceptable Use
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                We grant you a limited, non-exclusive, non-transferable, and revocable license to use TFTBuddy for personal and non-commercial purposes.
+                We grant you a limited, non-exclusive, non-transferable, and revocable license to use ChessBuddy for personal and non-commercial purposes.
               </p>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
                 You agree not to:
@@ -65,7 +65,7 @@ export default function TermsOfServicePage() {
                 4. Intellectual Property
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                All original content, features, and functionality of TFTBuddy (excluding third-party content and Riot Games' assets) are the exclusive property of TFTBuddy and its licensors.
+                All original content, features, and functionality of ChessBuddy (excluding third-party content and Riot Games' assets) are the exclusive property of ChessBuddy and its licensors.
               </p>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
                 Third-party trademarks and assets remain the property of their respective owners.
@@ -77,7 +77,7 @@ export default function TermsOfServicePage() {
                 5. Data Accuracy Disclaimer
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                TFTBuddy provides game-related data such as statistics, tier lists, and guides for informational purposes only. While we strive for accuracy, we do not guarantee that the information is complete, accurate, or up to date.
+                ChessBuddy provides game-related data such as statistics, tier lists, and guides for informational purposes only. While we strive for accuracy, we do not guarantee that the information is complete, accurate, or up to date.
               </p>
             </section>
 
@@ -86,7 +86,7 @@ export default function TermsOfServicePage() {
                 6. Limitation of Liability
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                TFTBuddy is provided on an "AS IS" and "AS AVAILABLE" basis. To the fullest extent permitted by law, TFTBuddy and its developers shall not be liable for any indirect, incidental, or consequential damages arising from the use or inability to use the app.
+                ChessBuddy is provided on an "AS IS" and "AS AVAILABLE" basis. To the fullest extent permitted by law, ChessBuddy and its developers shall not be liable for any indirect, incidental, or consequential damages arising from the use or inability to use the app.
               </p>
             </section>
 
@@ -95,7 +95,7 @@ export default function TermsOfServicePage() {
                 7. Termination
               </h2>
               <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                We reserve the right to suspend or terminate access to TFTBuddy at any time, without prior notice, if you violate these Terms or misuse the application.
+                We reserve the right to suspend or terminate access to ChessBuddy at any time, without prior notice, if you violate these Terms or misuse the application.
               </p>
             </section>
 
