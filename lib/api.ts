@@ -1,6 +1,6 @@
 // API client for compositions
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3900';
+const API_BASE_URL = "https://api.apporastudio.com";
 const API_PREFIX = '/api/v1';
 
 // Auth interfaces
