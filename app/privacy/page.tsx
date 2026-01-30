@@ -14,181 +14,226 @@ export default function PrivacyPolicyPage() {
             PRIVACY POLICY
           </h1>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-8">
-            Last Updated: January 03, 2026
+            Last Updated: January 30, 2026
           </p>
 
           <div className="prose prose-zinc dark:prose-invert max-w-none">
+            {/* 1. Introduction */}
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
-                1. Introduction
-              </h2>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
-                Welcome to ChessBuddy.
+              <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
+              <p>
+                Welcome to ChessBuddy. We respect your privacy and are committed
+                to protecting your information.
               </p>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                We respect your privacy and are committed to protecting your information. This Privacy Policy explains how we collect, use, and safeguard information when you use our mobile application.
+              <p className="mt-4">
+                This Privacy Policy explains how we collect, use, and safeguard
+                information when you use the ChessBuddy mobile application.
               </p>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mt-4">
-                By using ChessBuddy, you agree to the practices described in this Privacy Policy.
+              <p className="mt-4">
+                By using ChessBuddy, you agree to the practices described in this
+                Privacy Policy.
               </p>
             </section>
 
+            {/* 2. Information We Collect */}
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
+              <h2 className="text-2xl font-semibold mb-4">
                 2. Information We Collect
               </h2>
-              
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xl font-medium text-black dark:text-zinc-50 mb-2">2.1 Personal Information</h3>
-                  <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
-                    We do not collect personally identifiable information such as your name, email address, phone number, or precise location unless you voluntarily provide it.
-                  </p>
-                  <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                    If you choose to enter a Riot ID or Summoner Name, this information is used solely to retrieve publicly available game-related data via official Riot Games APIs. We do not use this information for identification outside of in-app functionality.
-                  </p>
-                </div>
 
-                <div>
-                  <h3 className="text-xl font-medium text-black dark:text-zinc-50 mb-2">2.2 Location and Language Information</h3>
-                  <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                    We may collect:
-                  </p>
-                  <ul className="list-disc list-inside space-y-1 text-zinc-700 dark:text-zinc-300 ml-4 mb-4">
-                    <li>Approximate location information (such as country or region)</li>
-                    <li>Device language settings</li>
-                  </ul>
-                  <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                    This information:
-                  </p>
-                  <ul className="list-disc list-inside space-y-1 text-zinc-700 dark:text-zinc-300 ml-4">
-                    <li>Is collected in an anonymized form</li>
-                    <li>Is not linked to your identity</li>
-                    <li>Does not include precise GPS location data</li>
-                  </ul>
-                </div>
+              {/* 2.1 Personal Information */}
+              <div className="mb-6">
+                <h3 className="text-xl font-medium mb-2">
+                  2.1 Personal Information
+                </h3>
+                <p>
+                  We do not require you to create an account and do not collect
+                  personal information such as your name, email address, phone
+                  number, or precise location unless you voluntarily provide it.
+                </p>
+                <p className="mt-4">
+                  If you choose to enter a Riot ID or Summoner Name, this
+                  information is used solely to retrieve publicly available
+                  game-related data via official Riot Games APIs and is not used
+                  to identify you outside of app functionality.
+                </p>
+              </div>
 
-                <div>
-                  <h3 className="text-xl font-medium text-black dark:text-zinc-50 mb-2">2.3 Usage Data</h3>
-                  <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                    We may collect anonymous usage data, such as:
-                  </p>
-                  <ul className="list-disc list-inside space-y-1 text-zinc-700 dark:text-zinc-300 ml-4 mb-4">
-                    <li>App interactions</li>
-                    <li>Device type</li>
-                    <li>Operating system version</li>
-                    <li>General usage patterns</li>
-                  </ul>
-                  <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                    This data is used only to understand overall app performance and feature usage. We do not use third-party advertising or analytics SDKs for tracking purposes.
-                  </p>
-                </div>
+              {/* 2.2 Location and Language */}
+              <div className="mb-6">
+                <h3 className="text-xl font-medium mb-2">
+                  2.2 Location and Language Information
+                </h3>
+                <p>We may collect limited non-precise information such as:</p>
+                <ul className="list-disc list-inside ml-4 mt-2">
+                  <li>Approximate location (country or region)</li>
+                  <li>Device language and locale settings</li>
+                </ul>
+                <p className="mt-4">
+                  This information does not include precise GPS location data and
+                  is used to improve app localization, performance, and
+                  analytics.
+                </p>
+              </div>
+
+              {/* 2.3 Usage Data */}
+              <div className="mb-6">
+                <h3 className="text-xl font-medium mb-2">2.3 Usage Data</h3>
+                <p>
+                  We may collect usage data such as app launches, taps, views,
+                  scrolling behavior, and interactions with content and
+                  advertisements.
+                </p>
+                <p className="mt-4">
+                  This data may be collected directly by us or by third-party
+                  partners for analytics and advertising purposes.
+                </p>
+              </div>
+
+              {/* 2.4 Advertising & Tracking */}
+              <div>
+                <h3 className="text-xl font-medium mb-2">
+                  2.4 Advertising and Tracking
+                </h3>
+                <p>
+                  ChessBuddy displays third-party advertisements provided by
+                  Google AdMob.
+                </p>
+                <p className="mt-4">
+                  AdMob may collect and use device identifiers (such as the
+                  device’s advertising identifier), product interaction data,
+                  and advertising data to:
+                </p>
+                <ul className="list-disc list-inside ml-4 mt-2">
+                  <li>Deliver personalized or non-personalized ads</li>
+                  <li>Measure advertising performance</li>
+                  <li>Prevent fraud and abuse</li>
+                  <li>Perform analytics and attribution</li>
+                </ul>
+                <p className="mt-4">
+                  This data may be considered “tracking” under Apple’s App
+                  Tracking Transparency (ATT) framework.
+                </p>
               </div>
             </section>
 
+            {/* 3. How We Use Your Information */}
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
+              <h2 className="text-2xl font-semibold mb-4">
                 3. How We Use Your Information
               </h2>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                We use the collected information to:
-              </p>
-              <ul className="list-disc list-inside space-y-1 text-zinc-700 dark:text-zinc-300 ml-4 mb-4">
+              <p>We use collected information to:</p>
+              <ul className="list-disc list-inside ml-4 mt-2">
                 <li>Provide and maintain core app functionality</li>
                 <li>Display game-related information and statistics</li>
                 <li>Improve app performance, stability, and user experience</li>
-                <li>Analyze aggregated usage trends to guide future improvements</li>
-              </ul>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                We do not use your data for:
-              </p>
-              <ul className="list-disc list-inside space-y-1 text-zinc-700 dark:text-zinc-300 ml-4">
-                <li>Advertising</li>
-                <li>Marketing communications</li>
-                <li>Cross-app or cross-service tracking</li>
+                <li>Analyze aggregated usage and performance metrics</li>
+                <li>Display third-party advertisements</li>
+                <li>Measure the effectiveness of advertising campaigns</li>
               </ul>
             </section>
 
+            {/* 4. Data Retention */}
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
-                4. Data Retention
-              </h2>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
-                We retain collected information only for as long as necessary to fulfill the purposes described in this Privacy Policy.
+              <h2 className="text-2xl font-semibold mb-4">4. Data Retention</h2>
+              <p>
+                We retain collected information only for as long as necessary to
+                fulfill the purposes described in this Privacy Policy.
               </p>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                Aggregated and anonymized data may be retained for statistical analysis. You may request deletion of any associated data by contacting us.
+              <p className="mt-4">
+                Aggregated or anonymized data may be retained for statistical and
+                analytical purposes.
               </p>
             </section>
 
+            {/* 5. Data Sharing */}
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
-                5. Data Sharing
-              </h2>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
-                We do not sell, rent, or share your data with third parties for advertising or tracking purposes.
+              <h2 className="text-2xl font-semibold mb-4">5. Data Sharing</h2>
+              <p>
+                We do not sell your personal data. However, we may share certain
+                data with trusted third-party service providers, such as Google
+                AdMob, solely for advertising, analytics, and app functionality.
               </p>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                Game-related data retrieved using Riot APIs is governed by Riot Games’ terms and policies.
-              </p>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
-                6. Data Security
-              </h2>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                We implement reasonable technical and organizational measures to protect the information we collect against unauthorized access, loss, or misuse.
+              <p className="mt-4">
+                These third parties process data in accordance with their own
+                privacy policies and applicable laws.
               </p>
             </section>
 
+            {/* 6. Data Security */}
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
+              <h2 className="text-2xl font-semibold mb-4">6. Data Security</h2>
+              <p>
+                We implement reasonable technical and organizational safeguards
+                to protect the information we collect against unauthorized
+                access, loss, or misuse.
+              </p>
+            </section>
+
+            {/* 7. Children */}
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4">
                 7. Children’s Privacy
               </h2>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                ChessBuddy does not knowingly collect personal information from children under the age of 13. If you believe such information has been collected, please contact us and we will take appropriate action.
+              <p>
+                ChessBuddy does not knowingly collect personal information from
+                children under the age of 13.
               </p>
             </section>
 
+            {/* 8. Privacy Rights */}
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
+              <h2 className="text-2xl font-semibold mb-4">
                 8. Your Privacy Rights
               </h2>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                Depending on your jurisdiction, you may have the right to:
-              </p>
-              <ul className="list-disc list-inside space-y-1 text-zinc-700 dark:text-zinc-300 ml-4">
-                <li>Access your data</li>
-                <li>Request correction or deletion</li>
-                <li>Withdraw consent where applicable</li>
-              </ul>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mt-4">
-                You may exercise these rights by contacting us.
+              <p>
+                Depending on your jurisdiction, you may have the right to
+                access, correct, or delete your data, or withdraw consent where
+                applicable.
               </p>
             </section>
 
+            {/* 9. Changes */}
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
+              <h2 className="text-2xl font-semibold mb-4">
                 9. Changes to This Privacy Policy
               </h2>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                We may update this Privacy Policy from time to time. Any changes will be reflected by updating the “Last Updated” date above.
+              <p>
+                We may update this Privacy Policy from time to time. Changes will
+                be reflected by updating the “Last Updated” date above.
               </p>
             </section>
 
+            {/* 10. ATT */}
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
-                10. Contact Us
+              <h2 className="text-2xl font-semibold mb-4">
+                10. App Tracking Transparency
               </h2>
-              <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                If you have any questions or concerns about this Privacy Policy, please contact us at:{" "}
+              <p>
+                In accordance with Apple’s App Tracking Transparency framework,
+                ChessBuddy requests your permission before allowing tracking
+                across apps and websites owned by other companies.
+              </p>
+              <p className="mt-4">
+                You may allow or deny tracking. Your choice does not affect
+                access to core app functionality. You can change your preference
+                at any time in your device settings.
+              </p>
+            </section>
+
+            {/* 11. Contact */}
+            <section>
+              <h2 className="text-2xl font-semibold mb-4">11. Contact Us</h2>
+              <p>
+                If you have any questions about this Privacy Policy, please
+                contact us at{" "}
                 <a
                   href="mailto:apporastudio@gmail.com"
-                  className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
                 >
                   apporastudio@gmail.com
                 </a>
+                .
               </p>
             </section>
           </div>
